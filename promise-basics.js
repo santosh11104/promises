@@ -634,7 +634,23 @@ Write two .then() handlers:
 - Second handler multiplies the result by 2.
 
 Predict the final output.
-
+*/
+function getProduct(productId) {
+    return new Promise((resolve, reject) => {
+        if (!productId) {
+            reject(new Error("Product ID is missing"));
+        } else {
+            setTimeout(() => {
+                resolve({ productId, name: "Laptop" });
+            }, 1000);
+        }
+    });
+}
+// Example usage (Success)
+getProduct(101)
+  .then(product => console.log("Resolved:", product))
+  .catch(error => console.error("Error:", error.message));
+/*
 
 EXERCISE 3:
 
@@ -645,7 +661,31 @@ Handle it using catch().
 Return "DEFAULT_VALUE".
 
 Print the returned value in the next then().
+*/
+function getProduct(productId) {
+  return new Promise((resolve, reject) => {
+    if (!productId) {
+      reject(new Error("Product ID is missing"));
+    } else {
+      setTimeout(() => {
+        resolve({ productId, name: "Laptop" });
+      }, 1000);
+    }
+  });
+}
 
+// Calling without productId creates a rejected Promise
+getProduct()
+  .then(product => console.log("Resolved:", product)) // Skipped on rejection
+  .catch(error => {
+    console.error("Error:", error.message);
+    return "DEFAULT_VALUE"; // 1. Return the fallback value from catch()
+  }) // <-- No semicolon here!
+  .then(value => {
+    console.log(value); // 2. Prints the returned "DEFAULT_VALUE"
+  });
+
+/*
 
 EXERCISE 4:
 
@@ -662,7 +702,18 @@ Throw an Error inside a .then() handler.
 
 Catch it in a subsequent catch().
 
+*/
 
+Promise.resolve("Initial Data")
+  .then(value => {
+    console.log("First .then() received:", value); // Logs: "Initial Data"
+    // No return statement here!
+  })
+  .then(nextValue => {
+    console.log("Second .then() received:", nextValue); // Logs: undefined
+  });
+  ANSWER:undefined
+/*
 EXERCISE 6:
 
 Use finally() with both a fulfilled and rejected Promise.
@@ -670,7 +721,35 @@ Use finally() with both a fulfilled and rejected Promise.
 Observe when finally() executes.
 
 */
+/*
+.finally() executes every single time a Promise settles—whether it 
+succeeds (fulfills) or fails (rejects)—and runs right after the preceding .then() or .catch() completes.
+*/
 
+// 1. Fulfilled Promise
+Promise.resolve("Order #123 confirmed")
+  .then(result => {
+    console.log("Success:", result);
+    return result;
+  })
+  .catch(error => {
+    console.error("Error:", error.message);
+  })
+  .finally(() => {
+    console.log("Cleanup (Fulfilled): Hide loading spinner\n");
+  });
+
+// 2. Rejected Promise
+Promise.reject(new Error("Payment declined"))
+  .then(result => {
+    console.log("Success:", result);
+  })
+  .catch(error => {
+    console.error("Error:", error.message);
+  })
+  .finally(() => {
+    console.log("Cleanup (Rejected): Hide loading spinner");
+  });
 
 // ============================================================
 // END OF PROMISE BASICS

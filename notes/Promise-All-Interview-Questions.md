@@ -386,12 +386,49 @@ The aggregate Promise fulfils with an empty array: `[]`.
 - [ ] Explain what Promise.all() returns.
 - [ ] Explain concurrent initiation versus sequential execution.
 - [ ] Explain why Promise.all() does not invoke function references.
+      Promise.all() does not invoke function references because it is a Promise coordinator, not a task runner.
+       It expects an iterable (like an array) of already-created Promises or static values—it does not know how to call functions or what arguments to pass them.
+       Quick Summary Rule
+       [fn1, fn2] --> Array of Functions --> Promise.all treats them as static values and returns the functions untouched.
+       [fn1(), fn2()] ---> Array of Promises --> Functions start running immediately, and Promise.all waits for their resolved results.
+
+      /// Explanation start
+        function fetchUser() {
+          return Promise.resolve({ id: 1, name: "Alice" });
+        }
+
+        function fetchPosts() {
+          return Promise.resolve(["Post 1", "Post 2"]);
+        }
+
+        // ❌ WRONG: Passing uninvoked function references
+        Promise.all([fetchUser, fetchPosts])
+          .then(results => {
+            console.log(results);
+            // Output: [ [Function: fetchUser], [Function: fetchPosts] ]
+            // Neither function was ever executed!
+          });
+
+        // ✅ CORRECT: Invoking the functions so they return Promises
+        Promise.all([fetchUser(), fetchPosts()])
+          .then(results => {
+            console.log(results);
+            // Output: [ { id: 1, name: "Alice" }, [ "Post 1", "Post 2" ] ]
+          });
+          /// Explanation End
 - [ ] Explain input-order preservation.
+      Input-order preservation means that the results array returned by Promise.all() always matches the exact index order of the input array, regardless of which promise finishes first or last.
 - [ ] Explain fail-fast aggregate rejection.
+      Fail-fast aggregate rejection means that Promise.all() rejects immediately the moment any single input promise rejects—without waiting for the remaining pending promises to finish—and rejects with the exact error/reason of that first failing promise.
+
+
 - [ ] Explain why other operations are not automatically cancelled.
-- [ ] Explain why returning the Promise chain matters.
+      In promise.all each individual Promise tracks its own asynchronous operation, while Promise.all() creates a separate aggregate Promise that watches all of them.
+      - When you pass [fetchUser(), fetchOrders()] into Promise.all(), those functions are invoked before Promise.all() even runs.
+      The network requests, timers, or database queries are already kicked off and running independently in the background. Promise.all() only receives the resulting Promise objects to listen to—it did not start the work and has no handle to stop it.
+
 - [ ] Explain why logging is different from returning.
 - [ ] Implement mandatory and optional dependency handling.
 - [ ] Explain how catch recovery changes the resulting Promise.
 
-**Scope note:** `Promise.allSettled()`, `Promise.race()`, `Promise.any()`, and implementing Promise combinator polyfills are separate upcoming topics.
+
