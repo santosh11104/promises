@@ -162,11 +162,13 @@ Then use `items.length` and `items[i]`.
 
 `Promise.all(iterable)` returns a new **aggregate Promise**.
 
-It: 1. Accepts an iterable of values and Promises. 2. Fulfils when all
-inputs fulfil. 3. Produces a results array in **input order**, not
-completion order. 4. Rejects when an input rejects. 5. Does not
-automatically cancel other operations after rejection. 6. Fulfils with
-an empty array when given an empty iterable.
+It: 
+1. Accepts an iterable of values and Promises. 
+2. Fulfils when all inputs fulfil. 
+3. Produces a results array in **input order**, not completion order. 
+4. Rejects when an input rejects. 
+5. Does not automatically cancel other operations after rejection. 
+6. Fulfils with an empty array when given an empty iterable.
 
 ### Input order is not completion order
 
